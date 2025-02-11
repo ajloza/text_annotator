@@ -240,7 +240,7 @@ class Editor():
         return word
 
     def annotate(self):
-        annotation = self.command_prompt('annotation:')
+        annotation = self.command_prompt('annotation: ')
         self.annotations_start.append(self.a_start)
         self.annotations_end.append(self.a_end+1)
         self.annotations_content.append(annotation)
@@ -256,7 +256,7 @@ class Editor():
         self.a_end = sum(self.buffc[:self.cury])+self.curx
 
     def remove(self):
-        id = self.command_prompt('remove (0-index):')
+        id = self.command_prompt('remove (0-index): ')
         try: 
             id = int(id)
             if id < len(self.annotations_content) and id >=0:

@@ -2,6 +2,30 @@
 
 CLI tool for text annotation. Start from scratch or load from JSON. Select text spans, add annotations, delete as needed, and save to JSON. Basic highlighting supported.
 
+
+![screenshot](pscreenshot.png)
+
+
+```JSON
+{
+    "annotations_start": [
+        0,
+        1252,
+        934
+    ],
+    "annotations_end": [
+        38,
+        1272,
+        941
+    ],
+    "annotations_content": [
+        "title",
+        "person",
+        "year"
+    ]
+}
+```
+
 ## Workflow
 1. `python annotator.py yourfile.txt`
 2. if there is a corresponding yourfile.json, it will be loaded and annotations applied

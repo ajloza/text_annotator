@@ -1,14 +1,17 @@
 {
     "annotations_start": [
         0,
-        1252
+        1252,
+        934
     ],
     "annotations_end": [
-        37,
-        1272
+        38,
+        1272,
+        941
     ],
     "annotations_content": [
-        "Title",
-        "person"
+        "title",
+        "person",
+        "year"
     ]
 }
