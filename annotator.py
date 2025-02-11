@@ -271,9 +271,9 @@ class Editor():
 
     def save_to_json(self):
         data = {
-            "annotations_start": self.annotations_start,
-            "annotations_end": self.annotations_end,
-            "annotations_content": self.annotations_content
+            "start": self.annotations_start,
+            "end": self.annotations_end,
+            "label": self.annotations_content
         }
         json_filename = os.path.splitext(self.filename)[0] + '.json'
         with open(json_filename, 'w', encoding='utf-8') as f:
@@ -304,9 +304,9 @@ class Editor():
         if os.path.exists(json_filename):
             with open(json_filename, 'r', encoding='utf-8') as f:
                 data = json.load(f)
-                self.annotations_start = data.get("annotations_start", [])
-                self.annotations_end = data.get("annotations_end", [])
-                self.annotations_content = data.get("annotations_content", [])
+                self.annotations_start = data.get("start", [])
+                self.annotations_end = data.get("end", [])
+                self.annotations_content = data.get("label", [])
 
         self.ROWS -= 1+len(self.annotations_start)
         self.update_screen()

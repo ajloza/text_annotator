@@ -8,17 +8,17 @@ CLI tool for text annotation. Start from scratch or load from JSON. Select text 
 
 ```JSON
 {
-    "annotations_start": [
+    "start": [
         0,
         1252,
         934
     ],
-    "annotations_end": [
+    "end": [
         38,
         1272,
         941
     ],
-    "annotations_content": [
+    "label": [
         "title",
         "person",
         "year"
