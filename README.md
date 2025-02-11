@@ -2,6 +2,14 @@
 
 CLI tool for text annotation. Start from scratch or load from JSON. Select text spans, add annotations, delete as needed, and save to JSON. Basic highlighting supported.
 
+Supports:
+1. overlapping spans
+2. multiple labels per span
+
+TODO:
+- [ ] links
+- [ ] some better colors
+
 
 ![screenshot](screenshot.png)
 
