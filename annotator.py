@@ -86,7 +86,6 @@ class Editor():
                         self.move_cursor(curses.KEY_RIGHT)
             except: pass
 
-
     def scroll_page(self, key):
         count = 0
         while count != self.ROWS:
@@ -104,30 +103,7 @@ class Editor():
         if self.curx < self.offx: self.offx = self.curx
         if self.curx >= self.offx + self.COLS: self.offx = self.curx - self.COLS+1
 
-    def print_footer(self):
-        status = '\x1b[7m'
-        annotation_list = ''
-        if len(self.annotations_content) > 0:
-            for start,stop,content in zip(self.annotations_start,self.annotations_end,self.annotations_content):
-                    annotation_item = str(start)+ ',' + str(stop)+' '+content
-                    while len(annotation_item) < self.COLS: annotation_item += ' '
-                    annotation_list+=annotation_item
-        status += annotation_list
-        status_bar = self.filename + ' - ' + str(self.total_lines) + ' lines'
-        pos = 'Annotation: Start ' + str(self.a_start) + ', End ' + str(self.a_end)
-        while len(status_bar) < self.COLS - len(pos)-1: status_bar += ' '
-        status += status_bar
-        status += pos + ' '
-        status += '\x1b[m'
-        status += '\x1b[' + str(self.cury - self.offy+1) + ';' + str(self.curx - self.offx+1) + 'H'
-        status += '\x1b[?25h'
-        return status
-    
-    def set_start(self):
-        self.a_start = sum(self.buffc[:self.cury])+self.curx
-        
-    def set_end(self):
-        self.a_end = sum(self.buffc[:self.cury])+self.curx
+
 
     def print_buffer(self):
         print_buffer = '\x1b[?25l'
@@ -153,13 +129,15 @@ class Editor():
                 if self.a_end != '' and self.a_end >= line_start and self.a_end <= line_end: positions.append(self.a_end-line_start)
                 if self.a_end != '' and self.a_end >= line_start and self.a_end <= line_end: colors.append('\033[104m')
                 
+
+                starts, stops = consolidate_spans(self.annotations_start,self.annotations_end)
                 span_starts = []
-                for s in self.annotations_start:
+                for s in starts:
                     if s >= line_start and s <= line_end:
                         span_starts.append(s-line_start)
                 span_ends = []
-                for s in self.annotations_end:
-                    if s >= line_start and s <= line_end:
+                for s in stops:
+                    if s >= line_start and s <= line_end+1:
                         span_ends.append(s-line_start)
 
                 temp = color_chars(temp,positions,colors,span_starts,span_ends)
@@ -169,6 +147,25 @@ class Editor():
             print_buffer += '\x1b[K'
             print_buffer += '\r\n'
         return print_buffer
+    
+    def print_footer(self):
+        status = '\x1b[7m'
+        annotation_list = ''
+        if len(self.annotations_content) > 0:
+            for start,stop,content in zip(self.annotations_start,self.annotations_end,self.annotations_content):
+                    annotation_item = str(start)+ ',' + str(stop)+' '+content
+                    while len(annotation_item) < self.COLS: annotation_item += ' '
+                    annotation_list+=annotation_item
+        status += annotation_list
+        status_bar = self.filename + ' - ' + str(self.total_lines) + ' lines'
+        pos = 'Annotation: Start ' + str(self.a_start) + ', End ' + str(self.a_end)
+        while len(status_bar) < self.COLS - len(pos)-1: status_bar += ' '
+        status += status_bar
+        status += pos + ' '
+        status += '\x1b[m'
+        status += '\x1b[' + str(self.cury - self.offy+1) + ';' + str(self.curx - self.offx+1) + 'H'
+        status += '\x1b[?25h'
+        return status
 
     def update_screen(self):
         self.scroll_buffer()
@@ -245,12 +242,18 @@ class Editor():
     def annotate(self):
         annotation = self.command_prompt('annotation:')
         self.annotations_start.append(self.a_start)
-        self.annotations_end.append(self.a_end)
+        self.annotations_end.append(self.a_end+1)
         self.annotations_content.append(annotation)
         self.a_start = ''
         self.a_end = ''
         self.ROWS,_ = self.screen.getmaxyx()
         self.ROWS -= 1+len(self.annotations_start)
+
+    def set_start(self):
+        self.a_start = sum(self.buffc[:self.cury])+self.curx
+        
+    def set_end(self):
+        self.a_end = sum(self.buffc[:self.cury])+self.curx
 
     def remove(self):
         id = self.command_prompt('remove (0-index):')
@@ -341,8 +344,32 @@ def color_chars(s, positions, color_code=['\033[101m','\033[104m'],span_starts=[
             color_i += 1
         else:
             result.append(c)
+    if len(span_ends)>0 and span_ends[-1]>i:
+        result.append('\033[39m')
     return ''.join(result)
 
+def consolidate_spans(starts,stops):
+    spans = sorted(zip(starts, stops))
+
+    merged_starts = []
+    merged_stops = []
+    current_start, current_stop = None, None
+
+    for start, stop in spans:
+        if current_start is None:  # First span
+            current_start, current_stop = start, stop
+        elif start <= current_stop:  # Overlapping or nested span
+            current_stop = max(current_stop, stop)  # Extend outermost span
+        else:  # Non-overlapping span
+            merged_starts.append(current_start)
+            merged_stops.append(current_stop)
+            current_start, current_stop = start, stop
+
+    if current_start is not None:  # Add the last span
+        merged_starts.append(current_start)
+        merged_stops.append(current_stop)
+
+    return merged_starts, merged_stops
 if __name__ == '__main__':
     def main(stdscr):
         editor = Editor()
