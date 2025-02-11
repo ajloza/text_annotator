@@ -3,7 +3,7 @@
 CLI tool for text annotation. Start from scratch or load from JSON. Select text spans, add annotations, delete as needed, and save to JSON. Basic highlighting supported.
 
 
-![screenshot](pscreenshot.png)
+![screenshot](screenshot.png)
 
 
 ```JSON
