@@ -5,11 +5,11 @@ CLI tool for text annotation. Start from scratch or load from JSON. Select text 
 Supports:
 1. overlapping spans
 2. multiple labels per span
+3. text is wrapped but newlines are included in the span (the start/end values refer to character positions). The end value is not inclusive so `text[start:stop]` will retrieve the appropriate snippet
 
 TODO:
 - [ ] links
 - [ ] some better colors
-
 
 ![screenshot](screenshot.png)
 
@@ -42,3 +42,6 @@ TODO:
 4. shift-'A' to add text annotation
 5. shift-'R' to remove annotation by index
 6. shift-'S' to save to JSON
+
+
+Built on cursor movement/scrolling behavior from https://github.com/maksimKorzh/code

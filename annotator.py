@@ -317,7 +317,6 @@ class Editor():
         else:
             return [s[i:i+self.COLS] for i in range(0, len(s), self.COLS)]
 
-
     def exit(self):
         curses.endwin()
         sys.exit(0)
