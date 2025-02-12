@@ -167,7 +167,7 @@ class Editor():
             idx = 0
             for start,stop,content in zip(self.annotations_start,self.annotations_end,self.annotations_content):
                     link_str = ','.join([str(link['child']) for link in self.links if link['parent'] == idx])
-                    annotation_item = str(idx)+': '+str(start)+ ',' + str(stop)+' '*(10-len(str(start))-len(str(stop)))+'| '+content+' | Children: '+link_str
+                    annotation_item = str(idx)+': '+str(start)+ ',' + str(stop)+' '*(10-len(str(start))-len(str(stop)))+'| '+content+' '*(16-len(content))+'| Children: '+link_str
                     while len(annotation_item) < self.COLS: annotation_item += ' '
                     annotation_list+=annotation_item
                     idx+=1
