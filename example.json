@@ -1,14 +1,30 @@
 {
     "start": [
         0,
-        934
+        934,
+        1187,
+        1252,
+        712
     ],
     "end": [
         38,
-        941
+        941,
+        1201,
+        1272,
+        717
     ],
     "label": [
         "title",
-        "year"
+        "year",
+        "object",
+        "person",
+        "language"
+    ],
+    "links": [
+        {
+            "parent": 3,
+            "child": 2,
+            "label": "inventor of"
+        }
     ]
 }
