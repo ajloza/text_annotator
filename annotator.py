@@ -105,6 +105,17 @@ class Editor():
         # if self.curx < self.offx: self.offx = self.curx
         # if self.curx >= self.offx + self.COLS: self.offx = self.curx - self.COLS+1
 
+    def find(self):
+        word = self.command_prompt('find: ')
+        for row in range(self.cury, len(self.buff)):
+            buffrow = self.buff[row]
+            line = ''.join(chr(c) for c in buffrow)
+            start_col = self.curx + 1 if row == self.cury else 0 
+            col = line.find(word, start_col)
+            if col != -1:
+                self.cury, self.curx = row, col
+                return  
+
 
 
     def print_buffer(self):
@@ -197,6 +208,7 @@ class Editor():
         elif c == curses.KEY_DOWN or c == 108: self.move_cursor(c)
         elif c == curses.KEY_MOUSE: self.jump_cursor(c)
         elif c == curses.KEY_BACKSPACE: self.delete_char()
+        elif c == ord('f'): self.find()
         elif c == 337 or c == 336: self.scroll_page(c)
         elif c == 402 or c == 393 or c == 119 or c ==98: self.skip_word(c)
         elif c == 115: self.set_start()
