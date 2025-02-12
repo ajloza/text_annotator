@@ -1,4 +1,3 @@
-#!/bin/python3
 import curses, sys, os, json
 import code 
 
