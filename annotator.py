@@ -1,5 +1,6 @@
 #!/bin/python3
 import curses, sys, os, json
+import code 
 
 class Editor():
     def __init__(self):
@@ -31,26 +32,28 @@ class Editor():
 
     def move_cursor(self, key):
         row = self.buff[self.cury] if self.cury < self.total_lines else None
-        if key == curses.KEY_LEFT:
+        if key == curses.KEY_LEFT or key == 104:
+            # code.interact(local = locals())
             if self.curx != 0: self.curx -= 1
             elif self.cury > 0:
                 self.cury -= 1
-                self.curx = len(self.buff[self.cury])
-        elif key == curses.KEY_RIGHT:
-            if row is not None and self.curx < len(row):
+                self.curx = len(self.buff[self.cury])-1
+        elif key == curses.KEY_RIGHT or key == 108:
+            if row is not None and self.curx < len(row)-1:
                 self.curx += 1
-            elif row is not None and self.curx == len(row) and self.cury != self.total_lines-1:
+            elif (self.curx == len(row)-1 or len(row)==0) and self.cury != self.total_lines-1:
                 self.cury += 1
                 self.curx = 0
-        elif key == curses.KEY_UP:
+        elif key == curses.KEY_UP or key == 107:
             if self.cury != 0: self.cury -= 1
             else: self.curx = 0
-        elif key == curses.KEY_DOWN:
+        elif key == curses.KEY_DOWN or key == 106:
             if self.cury < self.total_lines-1: self.cury += 1
             else: self.curx = len(self.buff[self.cury])
         row = self.buff[self.cury] if self.cury < self.total_lines else None
-        rowlen = len(row) if row is not None else 0
+        rowlen = len(row)-1 if row is not None else 0
         if self.curx > rowlen: self.curx = rowlen
+        if self.curx <0: self.curx = 0
 
 
     def jump_cursor(self,key):
@@ -63,7 +66,7 @@ class Editor():
             self.curx = len(self.buff[self.cury])
 
     def skip_word(self, key):
-        if key == 393:
+        if key == 393 or key == 98:
             self.move_cursor(curses.KEY_LEFT)
             try:
                 if self.buff[self.cury][self.curx] != ord(' '):
@@ -75,7 +78,7 @@ class Editor():
                         if self.curx == 0: break
                         self.move_cursor(curses.KEY_LEFT)
             except: pass
-        if key == 402:
+        if key == 402 or key == 119:
             self.move_cursor(curses.KEY_RIGHT)
             try:
                 if self.buff[self.cury][self.curx] != ord(' '):
@@ -100,8 +103,8 @@ class Editor():
     def scroll_buffer(self):
         if self.cury < self.offy: self.offy = self.cury
         if self.cury >= self.offy + self.ROWS: self.offy = self.cury - self.ROWS+1
-        if self.curx < self.offx: self.offx = self.curx
-        if self.curx >= self.offx + self.COLS: self.offx = self.curx - self.COLS+1
+        # if self.curx < self.offx: self.offx = self.curx
+        # if self.curx >= self.offx + self.COLS: self.offx = self.curx - self.COLS+1
 
 
 
@@ -189,16 +192,14 @@ class Editor():
         elif c == curses.KEY_RESIZE: self.resize_window()
         elif c == curses.KEY_HOME: self.curx = 0
         elif c == curses.KEY_END: self.curx = len(self.buff[self.cury])
-        elif c == curses.KEY_LEFT: self.move_cursor(c)
-        elif c == curses.KEY_RIGHT: self.move_cursor(c)
-        elif c == curses.KEY_UP: self.move_cursor(c)
-        elif c == curses.KEY_DOWN: self.move_cursor(c)
+        elif c == curses.KEY_LEFT or c == 104: self.move_cursor(c)
+        elif c == curses.KEY_RIGHT or c == 106: self.move_cursor(c)
+        elif c == curses.KEY_UP or c == 107: self.move_cursor(c)
+        elif c == curses.KEY_DOWN or c == 108: self.move_cursor(c)
         elif c == curses.KEY_MOUSE: self.jump_cursor(c)
         elif c == curses.KEY_BACKSPACE: self.delete_char()
-        elif c == 337: self.scroll_page(337)
-        elif c == 336: self.scroll_page(336)
-        elif c == 402: self.skip_word(402)
-        elif c == 393: self.skip_word(393)
+        elif c == 337 or c == 336: self.scroll_page(c)
+        elif c == 402 or c == 393 or c == 119 or c ==98: self.skip_word(c)
         elif c == 115: self.set_start()
         elif c == 101: self.set_end()
         elif c == 83: self.save_to_json()
