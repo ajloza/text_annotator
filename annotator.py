@@ -26,6 +26,7 @@ class Editor():
         self.annotations_start = []
         self.annotations_end = []
         self.annotations_content = []
+        self.links = []
         self.ROWS,_ = self.screen.getmaxyx()
         self.ROWS -= 1+len(self.annotations_start)
 
@@ -116,8 +117,6 @@ class Editor():
                 self.cury, self.curx = row, col
                 return  
 
-
-
     def print_buffer(self):
         print_buffer = '\x1b[?25l'
         print_buffer += '\x1b[H'
@@ -165,10 +164,13 @@ class Editor():
         status = '\x1b[7m'
         annotation_list = ''
         if len(self.annotations_content) > 0:
+            idx = 0
             for start,stop,content in zip(self.annotations_start,self.annotations_end,self.annotations_content):
-                    annotation_item = str(start)+ ',' + str(stop)+' '+content
+                    link_str = ','.join([str(link['child']) for link in self.links if link['parent'] == idx])
+                    annotation_item = str(idx)+': '+str(start)+ ',' + str(stop)+' '*(10-len(str(start))-len(str(stop)))+'| '+content+' | Children: '+link_str
                     while len(annotation_item) < self.COLS: annotation_item += ' '
                     annotation_list+=annotation_item
+                    idx+=1
         status += annotation_list
         status_bar = self.filename + ' - ' + str(self.total_lines) + ' lines'
         pos = 'Annotation: Start ' + str(self.a_start) + ', End ' + str(self.a_end)
@@ -209,6 +211,7 @@ class Editor():
         elif c == curses.KEY_MOUSE: self.jump_cursor(c)
         elif c == curses.KEY_BACKSPACE: self.delete_char()
         elif c == ord('f'): self.find()
+        elif c == 76: self.link()
         elif c == 337 or c == 336: self.scroll_page(c)
         elif c == 402 or c == 393 or c == 119 or c ==98: self.skip_word(c)
         elif c == 115: self.set_start()
@@ -261,6 +264,19 @@ class Editor():
         self.ROWS,_ = self.screen.getmaxyx()
         self.ROWS -= 1+len(self.annotations_start)
 
+    def link(self):
+        parent = self.command_prompt('parent (0-index): ')
+        self.update_screen()
+        child = self.command_prompt('child (0-index): ')
+        self.update_screen()
+        label = self.command_prompt('label: ')
+        try: 
+            parent = int(parent)
+            child = int(child)
+            self.links.append({'parent':parent,'child':child,'label':label})
+        except:
+            return
+
     def set_start(self):
         self.a_start = sum(self.buffc[:self.cury])+self.curx
         
@@ -277,6 +293,7 @@ class Editor():
                 del self.annotations_end[id]
                 self.ROWS,_ = self.screen.getmaxyx()
                 self.ROWS -= 1+len(self.annotations_start)
+                self.links = [link for link in self.links if link['parent'] != id and link['child'] != id]
                 self.update_screen()
         except: 
             return
@@ -285,7 +302,8 @@ class Editor():
         data = {
             "start": self.annotations_start,
             "end": self.annotations_end,
-            "label": self.annotations_content
+            "label": self.annotations_content,
+            "links": self.links
         }
         json_filename = os.path.splitext(self.filename)[0] + '.json'
         with open(json_filename, 'w', encoding='utf-8') as f:
@@ -295,8 +313,8 @@ class Editor():
         self.reset()
         try:
             with open(filename) as f:
-                content = f.read().split('\n')
-                for row in content:
+                self.content = f.read().split('\n')
+                for row in self.content:
                     line = self.split_lines(row)
                     for s in line:
                         self.buff.append([ord(c) for c in s])
@@ -319,6 +337,7 @@ class Editor():
                 self.annotations_start = data.get("start", [])
                 self.annotations_end = data.get("end", [])
                 self.annotations_content = data.get("label", [])
+                self.links = data.get("links",[])
 
         self.ROWS -= 1+len(self.annotations_start)
         self.update_screen()
