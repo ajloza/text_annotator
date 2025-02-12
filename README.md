@@ -1,6 +1,6 @@
 # Text Annotator
 
-Terminal-based text annotation tool. Start from scratch or load from JSON. Select text spans, add annotations, link annotation, delete as needed, and save to JSON. Basic VIM keybindings for navigation
+Terminal-based text annotation tool. Start from scratch or load from JSON. Select text spans, add annotations, link annotation, delete as needed, and save to JSON. Mouse, arrows, as well as basic VIM keybindings for navigation.
 
 Supports:
 1. overlapping spans
@@ -8,7 +8,6 @@ Supports:
 3. links between annotations
 4. multiple links between same annotations
 5. text is wrapped but the start/end values refer to character positions in the underlying text. The end value is not inclusive so when extrating a span `text[start:end]` will retrieve the appropriate full snippet
-6. never need to leave your keyboard
 
 ![screenshot](screenshot.png)
 
